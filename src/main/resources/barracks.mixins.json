@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "codyhuh.barracks.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "ArrowOfAllegiance.refmap.json",
+  "mixins": [
+    "LevelRendererMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
