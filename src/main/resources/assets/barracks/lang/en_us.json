@@ -1,5 +1,9 @@
 {
   "item.barracks.allegiant_arrow": "Arrow of Allegiance",
+  "item.barracks.gui_opener": "Opener of GUIs",
+  "item.barracks.spindly_gauntlet": "Spindly Gauntlet",
 
-  "entity.barracks.allegiant_arrow": "Arrow of Allegiance"
+  "entity.barracks.allegiant_arrow": "Arrow of Allegiance",
+
+  "menu.barracks.gui": "Test GUI"
 }

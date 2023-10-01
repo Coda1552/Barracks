@@ -1,8 +1,11 @@
 package codyhuh.barracks.client;
 
 import codyhuh.barracks.Barracks;
-import codyhuh.barracks.client.render.AllegiantArrowRenderer;
+import codyhuh.barracks.client.renders.AllegiantArrowRenderer;
+import codyhuh.barracks.client.screen.LetterScreen;
 import codyhuh.barracks.registry.ModEntities;
+import codyhuh.barracks.registry.ModMenus;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -15,5 +18,7 @@ public class ClientEvents {
     @SubscribeEvent
     public static void clientSetup(final FMLClientSetupEvent e) {
         EntityRenderers.register(ModEntities.ALLEGIANT_ARROW.get(), AllegiantArrowRenderer::new);
+        MenuScreens.register(ModMenus.LETTER.get(), LetterScreen::new);
     }
+
 }
