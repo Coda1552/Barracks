@@ -13,8 +13,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
-    Minecraft mc = Minecraft.getInstance();
-    EntityHitResult lookAtEntity = Barracks.getLookAtEntity(mc.player, mc.level, 64.0D);
 
     @Redirect(method = "renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getTeamColor()I"))
     private int barracks_getTeamColor(Entity entity) {
