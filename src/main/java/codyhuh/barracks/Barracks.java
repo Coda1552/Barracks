@@ -44,6 +44,7 @@ public class Barracks {
         }
     }
 
+    // todo- add Util.getMillis() check for if the entity has changed in the last 1/4 of a second, and if not don't update hit result
     public static EntityHitResult getLookAtEntity(Player player, Level level, double range) {
         Vec3 eyePos = player.getEyePosition(1.0F);
         Vec3 viewVec = player.getViewVector(1.0F);

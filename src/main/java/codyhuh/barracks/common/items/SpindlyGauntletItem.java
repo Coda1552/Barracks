@@ -24,11 +24,9 @@ public class SpindlyGauntletItem extends Item implements Vanishable {
             EntityHitResult result = Barracks.getLookAtEntity(player, level, 64.0D);
 
             if (result != null && result.getEntity() instanceof LivingEntity living) {
-                living.hurt(living.damageSources().generic(), 5.0F);
+                living.hurt(living.damageSources().generic(), 0.0F);
                 living.addEffect(new MobEffectInstance(MobEffects.GLOWING, 2, 0, true, false, false));
-
             }
         }
     }
-
 }
