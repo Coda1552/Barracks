@@ -6,6 +6,7 @@ import codyhuh.barracks.registry.ModMenus;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.AbstractFish;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -15,6 +16,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -34,6 +36,11 @@ public class Barracks {
         ModMenus.MENUS.register(bus);
 
         bus.addListener(this::populateTabs);
+        bus.addListener(this::createAttributes);
+    }
+
+    private void createAttributes(EntityAttributeCreationEvent e) {
+        e.put(ModEntities.FAA.get(), AbstractFish.createAttributes().build());
     }
 
     private void populateTabs(BuildCreativeModeTabContentsEvent e) {
