@@ -56,7 +56,7 @@ public class FaaModel<T extends Entity> extends EntityModel<T> {
 			f = 1.5F;
 		}
 
-		this.tailBase.yRot = -f * 0.45F * Mth.sin(0.6F * ageInTicks);
+		//this.tailBase.yRot = -f * 0.45F * Mth.sin(0.6F * ageInTicks);
 	}
 
 	@Override

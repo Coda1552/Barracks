@@ -1,4 +1,4 @@
-package codyhuh.barracks.common.entities.ai;
+package codyhuh.barracks.common.entities.util;
 
 import net.minecraft.world.entity.ai.goal.RandomSwimmingGoal;
 import net.minecraft.world.entity.animal.AbstractSchoolingFish;
@@ -14,11 +14,6 @@ public class FishConstantSwimGoal extends RandomSwimmingGoal {
     @Override
     public boolean canUse() {
         return !fish.isFollower() && super.canUse();
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
     }
 
 }

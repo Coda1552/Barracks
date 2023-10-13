@@ -25,7 +25,7 @@ public class FaaRenderer extends MobRenderer<Faa, FaaModel<Faa>> {
    protected void setupRotations(Faa pEntityLiving, PoseStack pMatrixStack, float pAgeInTicks, float pRotationYaw, float pPartialTicks) {
       super.setupRotations(pEntityLiving, pMatrixStack, pAgeInTicks, pRotationYaw, pPartialTicks);
       float f = 4.3F * Mth.sin(0.6F * pAgeInTicks);
-      pMatrixStack.mulPose(Axis.YP.rotationDegrees(f));
+      //pMatrixStack.mulPose(Axis.YP.rotationDegrees(f));
       if (!pEntityLiving.isInWater()) {
          pMatrixStack.translate(0.1F, 0.1F, -0.1F);
          pMatrixStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
