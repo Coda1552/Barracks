@@ -14,12 +14,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+
+import java.util.function.Predicate;
 
 public class AllegiantArrow extends AbstractArrow {
     private boolean retrieving;
@@ -48,8 +52,8 @@ public class AllegiantArrow extends AbstractArrow {
 
         for (int i = 0; i < 10; i++) {
             level().addParticle(new DustParticleOptions(Vec3.fromRGB24(0xa22098).toVector3f(), 1.0F), getX(), getY(), getZ(), 0.0D, 0.0D, 0.0D);
-//            level().addParticle(new DustParticleOptions(Vec3.fromRGB24(0x9247d1).toVector3f(), 1.0F), getX(), getY(), getZ(), 0.0D, 0.0D, 0.0D);
-//            level().addParticle(new DustParticleOptions(Vec3.fromRGB24(0xff5555).toVector3f(), 1.0F), getX(), getY(), getZ(), 0.0D, 0.0D, 0.0D);
+            //level().addParticle(new DustParticleOptions(Vec3.fromRGB24(0x9247d1).toVector3f(), 1.0F), getX(), getY(), getZ(), 0.0D, 0.0D, 0.0D);
+            //level().addParticle(new DustParticleOptions(Vec3.fromRGB24(0xff5555).toVector3f(), 1.0F), getX(), getY(), getZ(), 0.0D, 0.0D, 0.0D);
         }
 
         if (isCurrentlyGlowing()) {
@@ -70,10 +74,20 @@ public class AllegiantArrow extends AbstractArrow {
                 }
             }
             else {
+                double range = 16.0D;
+                Vec3 eyePos = player.getEyePosition(1.0F);
                 Vec3 viewVec = player.getViewVector(1.0F);
+                Vec3 endVec = eyePos.add(viewVec.x * range, viewVec.y * range, viewVec.z * range);
+
+                BlockHitResult result = level().clip(new ClipContext(eyePos, endVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+                BlockHitResult modifiedResult = result.withPosition(result.getBlockPos().relative(result.getDirection(), 1));
+
+                Vec3 pos = modifiedResult.getLocation();
+
+                setDeltaMovement(pos.x - position().x, pos.y - position().y, pos.z - position().z);
+                setDeltaMovement(getDeltaMovement().scale(0.5D));
 
                 retrieving = false;
-                setDeltaMovement(viewVec.scale(0.9D));
             }
         }
     }
