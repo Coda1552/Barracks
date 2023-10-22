@@ -1,6 +1,7 @@
 package codyhuh.barracks;
 
 import codyhuh.barracks.registry.ModEntities;
+import codyhuh.barracks.registry.ModFeatures;
 import codyhuh.barracks.registry.ModItems;
 import codyhuh.barracks.registry.ModMenus;
 import net.minecraft.world.entity.Entity;
@@ -34,6 +35,7 @@ public class Barracks {
         ModEntities.ENTITIES.register(bus);
         ModItems.ITEMS.register(bus);
         ModMenus.MENUS.register(bus);
+        ModFeatures.FEATURES.register(bus);
 
         bus.addListener(this::populateTabs);
         bus.addListener(this::createAttributes);

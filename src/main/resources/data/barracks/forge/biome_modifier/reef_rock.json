@@ -1,0 +1,11 @@
+{
+  "type": "forge:add_features",
+  "biomes": "minecraft:warm_ocean",
+  "features": [
+    "barracks:small_reef_rock",
+    "barracks:medium_reef_rock",
+    "barracks:large_reef_rock",
+    "barracks:coral_patch"
+  ],
+  "step": "underground_decoration"
+}
