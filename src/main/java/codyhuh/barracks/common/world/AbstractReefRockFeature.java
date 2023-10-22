@@ -3,16 +3,24 @@ package codyhuh.barracks.common.world;
 import codyhuh.barracks.FastNoiseLite;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CoralWallFanBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraftforge.common.Tags;
+
+import java.util.Optional;
 
 public abstract class AbstractReefRockFeature extends Feature<NoneFeatureConfiguration> {
 
@@ -26,10 +34,9 @@ public abstract class AbstractReefRockFeature extends Feature<NoneFeatureConfigu
         BlockPos blockPos = pContext.origin();
         RandomSource random = pContext.random();
 
-        FastNoiseLite noise = createNoise(worldGenLevel.getSeed() + random.nextLong(), 0.11F);
+        FastNoiseLite noise = createNoise(worldGenLevel.getSeed() + random.nextLong(), 0.15F);
 
         //Minecraft.getInstance().getChatListener().handleSystemMessage(Component.literal("Where am I? " + blockPos), false);
-
         BlockPos heightmapPos = worldGenLevel.getHeightmapPos(Heightmap.Types.OCEAN_FLOOR_WG, blockPos);
         blockPos = heightmapPos.offset(0, -4, 0); // Offset the origin once instead of multiple times
 
@@ -48,25 +55,25 @@ public abstract class AbstractReefRockFeature extends Feature<NoneFeatureConfigu
         int radius;
         int height;
 
-        BlockState block = Blocks.LIGHT_GRAY_WOOL.defaultBlockState();
-        BlockState block2 = Blocks.GRAY_WOOL.defaultBlockState();
-        BlockState block3 = Blocks.AIR.defaultBlockState();
-
-
         for (int i = 0; i < getConfigs().length; i++) {
             radius = getConfigs()[i][0];
             height = getConfigs()[i][1];
             boolean finalSection = i + 1 >= getConfigs().length;
+            boolean topSection = i == 0;
 
-            createRockSection(worldgenlevel, origin, radius, height, block, block2, block3, noise, finalSection);
+            createRockSection(worldgenlevel, origin, radius, height, Blocks.WATER.defaultBlockState(), noise, topSection);
         }
 
     }
 
-    private static void createRockSection(WorldGenLevel worldgenlevel, BlockPos origin, int radius, int height, BlockState block, BlockState block2, BlockState block3, FastNoiseLite noise, boolean finalSection) {
+    private static void createRockSection(WorldGenLevel worldgenlevel, BlockPos origin, int radius, int height, BlockState block, FastNoiseLite noise, boolean finalSection) {
         int heightLower = 0;
 
-        if(finalSection) {
+        Optional<Block> coral = BuiltInRegistries.BLOCK.getTag(BlockTags.CORAL_BLOCKS).flatMap((p_224980_) -> {
+            return p_224980_.getRandomElement(worldgenlevel.getRandom());
+        }).map(Holder::value);
+
+        if (finalSection) {
             heightLower = -height;
         }
 
@@ -79,19 +86,57 @@ public abstract class AbstractReefRockFeature extends Feature<NoneFeatureConfigu
                     float f = noise.GetNoise(x, (float) y, z);
 
                     if (distance < 1) {
-                        if (f < 0 && f > -0.3) {
+                        if (finalSection && f < -0.15 && f > -0.1625) {
+                            worldgenlevel.setBlock(pos, coral.map(Block::defaultBlockState).orElseGet(Blocks.STONE::defaultBlockState), 3);
+                            createPlates(worldgenlevel, pos, worldgenlevel.getBlockState(pos));
+                        }
+                        else if (f < 0 && f > -0.3) {
                             worldgenlevel.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
                         } else if (f <= 0.4 && f > 0) {
                             worldgenlevel.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
-                        } else if (f > 0.4 && f < 0.9 && (pos.getY() > origin.getY() + 15)) {
+                        } else if (f > 0.4 && f < 0.9) {
                             worldgenlevel.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
-                        } else if (pos.getY() < 63) {
+                        } else if (!worldgenlevel.getBlockState(pos).is(BlockTags.CORAL_BLOCKS) && pos.getY() < 63) {
                             worldgenlevel.setBlock(pos, Blocks.WATER.defaultBlockState(), 3);
-                        } else if (pos.getY() < 40) {
-                            worldgenlevel.setBlock(pos, block3, 3);
                         }
                         else {
-                            worldgenlevel.setBlock(pos, block3, 3);
+                            if (!worldgenlevel.getBlockState(pos).is(BlockTags.CORAL_BLOCKS)) {
+                                worldgenlevel.setBlock(pos, block, 3);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void createPlates(WorldGenLevel worldgenlevel, BlockPos coralPos, BlockState coralType) {
+        Optional<Block> coral = BuiltInRegistries.BLOCK.getTag(BlockTags.WALL_CORALS).flatMap((p_224980_) -> {
+            return p_224980_.getRandomElement(worldgenlevel.getRandom());
+        }).map(Holder::value);
+
+        for (int i = -2; i <= 2; i++) {
+            for (int j = -2; j <= 2; j++) {
+                BlockPos pos = coralPos.offset(i, 0, j);
+                double distance = distance(i, 1, j, 3, 1, 3);
+                if (distance < 1.8) {
+                    worldgenlevel.setBlock(pos, coralType, 3);
+
+                    for (Direction dir : Direction.Plane.HORIZONTAL) {
+                        BlockState block = coral.map(Block::defaultBlockState).orElseGet(Blocks.HORN_CORAL_WALL_FAN::defaultBlockState).setValue(CoralWallFanBlock.WATERLOGGED, true).setValue(CoralWallFanBlock.FACING, dir);
+
+                        // is there a worse way to do this?
+                        BlockPos fanPos0 = coralPos.relative(dir, 3);
+                        BlockPos fanPos1 = coralPos.relative(dir, 3).relative(dir.getClockWise());
+                        BlockPos fanPos2 = coralPos.relative(dir, 3).relative(dir.getCounterClockWise());
+                        if (worldgenlevel.getBlockState(fanPos0).is(Blocks.WATER)) {
+                            worldgenlevel.setBlock(fanPos0, block, 3);
+                        }
+                        if (worldgenlevel.getBlockState(fanPos1).is(Blocks.WATER)) {
+                            worldgenlevel.setBlock(fanPos1, block, 3);
+                        }
+                        if (worldgenlevel.getBlockState(fanPos2).is(Blocks.WATER)) {
+                            worldgenlevel.setBlock(fanPos2, block, 3);
                         }
                     }
                 }

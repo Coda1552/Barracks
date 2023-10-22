@@ -61,10 +61,21 @@ public class AllegiantArrow extends AbstractArrow {
         }
 
         if (owner instanceof Player player) {
+            double range = 16.0D;
+            Vec3 eyePos = player.getEyePosition(1.0F);
+            Vec3 viewVec = player.getViewVector(1.0F);
+            Vec3 endVec = eyePos.add(viewVec.x * range, viewVec.y * range, viewVec.z * range);
+            Vec3 returnEndVec = eyePos.add(viewVec.x * 0.1, viewVec.y * 0.1, viewVec.z * 0.1);
+
+            BlockHitResult result = player.isShiftKeyDown() ? level().clip(new ClipContext(eyePos, returnEndVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)) : level().clip(new ClipContext(eyePos, endVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+            BlockHitResult modifiedResult = result.withPosition(result.getBlockPos().relative(result.getDirection(), 1));
+
+            Vec3 pos = modifiedResult.getLocation();
+
             if (player.isShiftKeyDown()) {
 
-                Vec3 vec3 = new Vec3(player.getX() - this.getX(), player.getY() + (double)player.getEyeHeight() - this.getY(), player.getZ() - this.getZ());
-                this.setDeltaMovement(this.getDeltaMovement().add(vec3.normalize().scale(0.25D)));
+                setDeltaMovement(pos.x - position().x, pos.y - position().y, pos.z - position().z);
+                setDeltaMovement(getDeltaMovement().scale(0.5D));
 
                 retrieving = true;
 
@@ -74,16 +85,6 @@ public class AllegiantArrow extends AbstractArrow {
                 }
             }
             else {
-                double range = 16.0D;
-                Vec3 eyePos = player.getEyePosition(1.0F);
-                Vec3 viewVec = player.getViewVector(1.0F);
-                Vec3 endVec = eyePos.add(viewVec.x * range, viewVec.y * range, viewVec.z * range);
-
-                BlockHitResult result = level().clip(new ClipContext(eyePos, endVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-                BlockHitResult modifiedResult = result.withPosition(result.getBlockPos().relative(result.getDirection(), 1));
-
-                Vec3 pos = modifiedResult.getLocation();
-
                 setDeltaMovement(pos.x - position().x, pos.y - position().y, pos.z - position().z);
                 setDeltaMovement(getDeltaMovement().scale(0.5D));
 
