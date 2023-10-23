@@ -86,7 +86,7 @@ public abstract class AbstractReefRockFeature extends Feature<NoneFeatureConfigu
                     float f = noise.GetNoise(x, (float) y, z);
 
                     if (distance < 1) {
-                        if (finalSection && f < -0.15 && f > -0.1625) {
+                        if (finalSection && f < -0.15 && f > -0.165) {
                             worldgenlevel.setBlock(pos, coral.map(Block::defaultBlockState).orElseGet(Blocks.STONE::defaultBlockState), 3);
                             createPlates(worldgenlevel, pos, worldgenlevel.getBlockState(pos));
                         }
