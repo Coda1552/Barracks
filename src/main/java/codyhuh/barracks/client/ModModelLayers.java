@@ -5,7 +5,6 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.resources.ResourceLocation;
 
 public class ModModelLayers {
-
     public static final ModelLayerLocation FAA = create("faa");
 
     private static ModelLayerLocation create(String name) {
