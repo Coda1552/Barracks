@@ -1,9 +1,13 @@
 package codyhuh.barracks;
 
-import codyhuh.barracks.registry.ModEntities;
-import codyhuh.barracks.registry.ModFeatures;
-import codyhuh.barracks.registry.ModItems;
-import codyhuh.barracks.registry.ModMenus;
+import codyhuh.barracks.data.BarracksModdedBiomeSlices;
+import codyhuh.barracks.registry.*;
+import com.teamabnormals.blueprint.core.registry.BlueprintDataPackRegistries;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -16,6 +20,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -24,6 +31,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 @Mod(Barracks.MOD_ID)
 public class Barracks {
@@ -39,6 +48,21 @@ public class Barracks {
 
         bus.addListener(this::populateTabs);
         bus.addListener(this::createAttributes);
+        bus.addListener(this::dataSetup);
+    }
+
+
+    private void dataSetup(final GatherDataEvent event) {
+        final RegistrySetBuilder BUILDER = new RegistrySetBuilder().add(Registries.BIOME, ModBiomes::bootstrap).add(BlueprintDataPackRegistries.MODDED_BIOME_SLICES, BarracksModdedBiomeSlices::bootstrap);
+
+        DataGenerator generator = event.getGenerator();
+        PackOutput packOutput = generator.getPackOutput();
+        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+
+        boolean server = event.includeServer();
+
+        DatapackBuiltinEntriesProvider datapackBuiltinEntriesProvider = new DatapackBuiltinEntriesProvider(packOutput, lookupProvider, BUILDER, Set.of(Barracks.MOD_ID));
+        generator.addProvider(server, datapackBuiltinEntriesProvider);
     }
 
     private void createAttributes(EntityAttributeCreationEvent e) {

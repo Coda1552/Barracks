@@ -1,4 +1,4 @@
-package codyhuh.barracks.common.world;
+package codyhuh.barracks.common.world.feature;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;

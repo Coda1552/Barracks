@@ -1,4 +1,4 @@
-package codyhuh.barracks.common.world;
+package codyhuh.barracks.common.world.feature;
 
 import codyhuh.barracks.FastNoiseLite;
 import com.mojang.serialization.Codec;

@@ -1,4 +1,4 @@
-package codyhuh.barracks.common.world;
+package codyhuh.barracks.common.world.feature;
 
 import codyhuh.barracks.FastNoiseLite;
 import com.mojang.serialization.Codec;
@@ -18,7 +18,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-import net.minecraftforge.common.Tags;
 
 import java.util.Optional;
 
