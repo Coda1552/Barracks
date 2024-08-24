@@ -1,25 +1,17 @@
 package codyhuh.barracks.common.world.feature;
 
-import codyhuh.barracks.FastNoiseLite;
+import codyhuh.barracks.util.FastNoiseLite;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CoralWallFanBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-
-import java.util.Optional;
 
 public class SeaStackFeature extends Feature<NoneFeatureConfiguration> {
 
@@ -33,25 +25,19 @@ public class SeaStackFeature extends Feature<NoneFeatureConfiguration> {
         BlockPos blockPos = pContext.origin();
         RandomSource random = pContext.random();
 
-        FastNoiseLite noise = createNoise(worldGenLevel.getSeed() + random.nextLong(), 0.15F);
+        FastNoiseLite noise = createNoise(worldGenLevel.getSeed() + random.nextLong(), 0.1F);
 
         //Minecraft.getInstance().getChatListener().handleSystemMessage(Component.literal("Where am I? " + blockPos), false);
-        BlockPos heightmapPos = worldGenLevel.getHeightmapPos(Heightmap.Types.OCEAN_FLOOR_WG, blockPos);
-        blockPos = heightmapPos.offset(0, -1, 0); // Offset the origin once instead of multiple times
+        blockPos = blockPos.offset(0, worldGenLevel.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, blockPos.getX(), blockPos.getZ()) - 5, 0);
 
         createRock(worldGenLevel, blockPos, noise);
         return true;
     }
 
     public int[][] getConfigs() {
-        return new int[][]{
-                {5, 18},
-                {5, 10},
-                {5, 30},
-                {5, 30},
-                {5, 30},
-                {5, 15},
-                {5, 30}
+        return new int[][] {
+                {4, 75},
+                {5, 50}
         };
     }
 
@@ -61,11 +47,10 @@ public class SeaStackFeature extends Feature<NoneFeatureConfiguration> {
 
         for (int i = 0; i < getConfigs().length; i++) {
             radius = getConfigs()[i][0];
-            height = getConfigs()[i][1];
+            height = getConfigs()[i][1] + worldgenlevel.getRandom().nextInt(20);
             boolean finalSection = i + 1 >= getConfigs().length;
-            boolean topSection = i == 0;
 
-            createRockSection(worldgenlevel, origin, radius, height, Blocks.AIR.defaultBlockState(), noise, topSection);
+            createRockSection(worldgenlevel, origin, radius, height, Blocks.AIR.defaultBlockState(), noise, finalSection);
         }
 
     }
@@ -73,9 +58,9 @@ public class SeaStackFeature extends Feature<NoneFeatureConfiguration> {
     private static void createRockSection(WorldGenLevel worldgenlevel, BlockPos origin, int radius, int height, BlockState block, FastNoiseLite noise, boolean finalSection) {
         int heightLower = 0;
 
-//        if (finalSection) {
-//            heightLower = -height;
-//        }
+        if (finalSection) {
+            heightLower = -height;
+        }
 
         for (int x = -radius; x < radius; x++) {
             for (int y = heightLower; y < height; y++) {
@@ -85,53 +70,21 @@ public class SeaStackFeature extends Feature<NoneFeatureConfiguration> {
                     double distance = distance(x, y, z, radius, height, radius);
                     float f = noise.GetNoise(x, (float) y, z);
 
-                    if (distance < 1) {
-                        if (origin.getY() <= worldgenlevel.getSeaLevel()) {
+                    if (distance < 0.9) {
+                        if (!finalSection) {
+                            worldgenlevel.setBlock(pos, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+                        }
+                        else if (pos.getY() < worldgenlevel.getSeaLevel()) {
                             worldgenlevel.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
                         }
-                        else if (f < 0 && f > -0.3) {
+                        else if (f > -0.5 && f < 0.0) {
                             worldgenlevel.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
-                        } else if (f <= 0.4 && f > 0) {
-                            worldgenlevel.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
-                        } else if (f > 0.4 && f < 0.9) {
+                        }
+                        else if (f > 0.0 && f <= 1.0) {
                             worldgenlevel.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
                         }
                         else {
                             worldgenlevel.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public static void createPlates(WorldGenLevel worldgenlevel, BlockPos coralPos, BlockState coralType) {
-        Optional<Block> coral = BuiltInRegistries.BLOCK.getTag(BlockTags.WALL_CORALS).flatMap((p_224980_) -> {
-            return p_224980_.getRandomElement(worldgenlevel.getRandom());
-        }).map(Holder::value);
-
-        for (int i = -2; i <= 2; i++) {
-            for (int j = -2; j <= 2; j++) {
-                BlockPos pos = coralPos.offset(i, 0, j);
-                double distance = distance(i, 1, j, 3, 1, 3);
-                if (distance < 1.8) {
-                    worldgenlevel.setBlock(pos, coralType, 3);
-
-                    for (Direction dir : Direction.Plane.HORIZONTAL) {
-                        BlockState block = coral.map(Block::defaultBlockState).orElseGet(Blocks.HORN_CORAL_WALL_FAN::defaultBlockState).setValue(CoralWallFanBlock.WATERLOGGED, true).setValue(CoralWallFanBlock.FACING, dir);
-
-                        // is there a worse way to do this?
-                        BlockPos fanPos0 = coralPos.relative(dir, 3);
-                        BlockPos fanPos1 = coralPos.relative(dir, 3).relative(dir.getClockWise());
-                        BlockPos fanPos2 = coralPos.relative(dir, 3).relative(dir.getCounterClockWise());
-                        if (worldgenlevel.getBlockState(fanPos0).is(Blocks.WATER)) {
-                            worldgenlevel.setBlock(fanPos0, block, 3);
-                        }
-                        if (worldgenlevel.getBlockState(fanPos1).is(Blocks.WATER)) {
-                            worldgenlevel.setBlock(fanPos1, block, 3);
-                        }
-                        if (worldgenlevel.getBlockState(fanPos2).is(Blocks.WATER)) {
-                            worldgenlevel.setBlock(fanPos2, block, 3);
                         }
                     }
                 }
