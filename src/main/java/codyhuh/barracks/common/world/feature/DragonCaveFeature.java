@@ -1,6 +1,6 @@
 package codyhuh.barracks.common.world.feature;
 
-import codyhuh.barracks.FastNoiseLite;
+import codyhuh.barracks.util.FastNoiseLite;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;

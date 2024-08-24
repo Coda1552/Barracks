@@ -1,4 +1,4 @@
-package codyhuh.barracks;
+package codyhuh.barracks.util;
 
 // MIT License
 //

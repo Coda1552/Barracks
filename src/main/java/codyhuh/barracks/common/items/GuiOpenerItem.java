@@ -1,5 +1,6 @@
 package codyhuh.barracks.common.items;
 
+import codyhuh.barracks.client.screen.CritterpediaScreen;
 import codyhuh.barracks.client.screen.LetterScreen;
 import codyhuh.barracks.common.menus.LetterMenu;
 import codyhuh.barracks.registry.ModMenus;
@@ -20,9 +21,10 @@ public class GuiOpenerItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
 
-        player.openMenu(new SimpleMenuProvider((windowId, inv, owner) -> new LetterMenu(windowId, inv, stack), stack.getDisplayName()));
+        if (level.isClientSide) {
+            Minecraft.getInstance().setScreen(new CritterpediaScreen());
+        }
 
         return super.use(level, player, hand);
     }

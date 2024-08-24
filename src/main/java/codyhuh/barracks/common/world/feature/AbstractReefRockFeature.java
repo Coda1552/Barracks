@@ -1,6 +1,6 @@
 package codyhuh.barracks.common.world.feature;
 
-import codyhuh.barracks.FastNoiseLite;
+import codyhuh.barracks.util.FastNoiseLite;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -85,7 +85,7 @@ public abstract class AbstractReefRockFeature extends Feature<NoneFeatureConfigu
                     float f = noise.GetNoise(x, (float) y, z);
 
                     if (distance < 1) {
-                        if (finalSection && f < -0.15 && f > -0.1625) {
+                        if (finalSection && f < -0.15 && f > -0.165) {
                             worldgenlevel.setBlock(pos, coral.map(Block::defaultBlockState).orElseGet(Blocks.STONE::defaultBlockState), 3);
                             createPlates(worldgenlevel, pos, worldgenlevel.getBlockState(pos));
                         }
